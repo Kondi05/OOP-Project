@@ -1,0 +1,6 @@
+test to see if you can pull files successfully:
+
+what i do was git remote -v // to check if you're on Kondis project
+git fetch 
+git checkout main // it'll tell you if there are anyfiles you're behind on
+git pull // and you should have all the most recent changes in the repo
