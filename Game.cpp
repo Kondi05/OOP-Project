@@ -10,7 +10,9 @@ int main() {
 
     // Create a red square (50×50 pixels)
     RectangleShape character({50.f, 25.f});
-    character.setFillColor(Color::Red);
+    //Texture texture("Enemy.png", false, IntRect({15,15}, {100, 100}));
+    //Sprite Enemy(texture);
+    character.setFillColor(Color::Cyan);
     character.setPosition({400.f, 540.f});  // bot-middle
 
     // Main Event running. most functionality in this while loop.
@@ -30,6 +32,7 @@ int main() {
         // Rendering
         window.clear(Color::Black);
         window.draw(character);
+        //window.draw(Enemy);
         window.display();
     }
 
