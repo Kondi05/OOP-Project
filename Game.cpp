@@ -9,22 +9,27 @@ int main() {
     window.setFramerateLimit(60);
 
     // Create a red square (50×50 pixels)
-    sf::RectangleShape square({50.f, 25.f});
-    square.setFillColor(sf::Color::Red);
-    square.setPosition({400.f, 540.f});  // bot-middle
+    RectangleShape character({50.f, 25.f});
+    character.setFillColor(Color::Red);
+    character.setPosition({400.f, 540.f});  // bot-middle
 
     // Main Event running. most functionality in this while loop.
     while (window.isOpen()) {
         // Event handling
         window.handleEvents(
-            [&](const sf::Event::Closed& ) {
+            [&](const Event::Closed& ) {
                 window.close();
             }
         );
-
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
+        {
+            character.move({-7.f, 0.f}); // left key is pressed: move our character
+        }else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)){
+            character.move({7.f, 0.f}); // right key is pressed: move our character
+        }
         // Rendering
-        window.clear(sf::Color::Black);
-        window.draw(square);
+        window.clear(Color::Black);
+        window.draw(character);
         window.display();
     }
 
