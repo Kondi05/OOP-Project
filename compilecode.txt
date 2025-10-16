@@ -1,0 +1,6 @@
+/*for macOS*/
+
+g++ -std=c++20 test2.cpp -o test2 \
+-I/opt/homebrew/opt/sfml/include \
+-L/opt/homebrew/opt/sfml/lib \
+-lsfml-graphics -lsfml-window -lsfml-system
