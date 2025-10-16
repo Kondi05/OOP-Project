@@ -1,7 +1,8 @@
 #include <SFML/Graphics.hpp>
 using namespace sf;
 
-int main() {
+//note all functionality is in main() functiion currently this will need to be fixed later
+int main() { 
     // Create a window of size 800×600 with title can change res later**
     RenderWindow window(VideoMode({800, 600}), "Game basis");
 
