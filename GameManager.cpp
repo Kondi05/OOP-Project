@@ -33,15 +33,15 @@ void GameManager::spawnEnemies() {
 
 void GameManager::spawnWave() {
      int enemiesPerRow = 8;
-    int rows = 1;
+    int rows = 2;
     
     for (int row = 0; row < rows; ++row) {
         for (int col = 0; col < enemiesPerRow; ++col) {
-            float x = 100.0f + col * 80.0f;
-            float y = -30.0f - row * 60.0f; // Back row starts higher up
-            float enemySpeed = 0.5f + (currentLevel - 1) * 1.2f; // Increased speed scaling
+            float x = 60.0f + col * 90.0f;
+            float y = -50.0f - row * 80.0f; 
+            float enemySpeed = 0.8f + (currentLevel - 1) * 1.2f; // Increased speed scaling
             int bulletDamage = 15 + (currentLevel - 1) * 8; // Increased damage scaling
-            float bulletSpeed =1.0f + (currentLevel - 1) * 1.1f; // Bullet speed increases
+            float bulletSpeed =3.0f + (currentLevel - 1) * 1.2f; // Bullet speed increases
             int pointValue = 50 + (currentLevel * 25);
             
             auto enemy = std::make_unique<Enemy>(x, y, pointValue, enemySpeed, bulletDamage);
@@ -50,8 +50,7 @@ void GameManager::spawnWave() {
         }
     }
     
-    std::cout << "🔥 Wave " << currentLevel << " spawned! " 
-              << "Enemies: 16 (8 front + 8 back)" 
+    std::cout << "Wave " << currentLevel << " spawned " 
               << ", Speed: " << (1.0f + (currentLevel - 1) * 1.2f)
               << ", Bullet Damage: " << (15 + (currentLevel - 1) * 8)
               << ", Bullet Speed: " << (8.0f + (currentLevel - 1) * 2.0f) << std::endl;
@@ -59,7 +58,7 @@ void GameManager::spawnWave() {
 
 void GameManager::nextLevel() {
     currentLevel++;
-    std::cout << "🚀 LEVEL " << currentLevel << "! Difficulty increased!" << std::endl;
+    std::cout << "LEVEL " << currentLevel << "! Difficulty increased" << std::endl;
 }
 
 void GameManager::run() {
@@ -352,7 +351,7 @@ void GameManager::renderUI() {
         frameCount = 0;
     }
 }
-
+ //!!Notes some of these functions dont work yet!!
 void GameManager::displayMenu() {
     std::cout << "\n=== PAUSE MENU ===" << std::endl;
     std::cout << "S - Save Game" << std::endl;

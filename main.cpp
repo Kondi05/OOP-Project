@@ -3,18 +3,6 @@
 #include <stdexcept>
 #include "GameManager.h"
 
-/**
- * @brief Space Invaders Game - SFML 3.0.2
- * 
- * Main entry point demonstrating:
- * - OOP principles with 5+ classes and 3-level inheritance
- * - Polymorphism and abstract classes
- * - File I/O operations
- * - Error handling and input validation
- * - Memory management with smart pointers
- * - Interactive menu system
- */
-
 // Function to demonstrate polymorphism
 void demonstratePolymorphism() {
     std::cout << "=== Polymorphism Demonstration ===" << std::endl;

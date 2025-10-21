@@ -4,11 +4,10 @@
 #include "GameObject.h"
 #include <SFML/Graphics.hpp>
 
-/**
- * @brief Intermediate abstract class for entities with visual representation
- * 
- * Adds rendering capabilities and health system to the GameObject base class.
- * This creates a 3-level inheritance hierarchy: GameObject -> Entity -> Concrete Classes
+/*
+    abstract class for entities
+    Adds rendering and health system to the GameObject class.
+    3-level inheritance: GameObject -> Entity -> Bullet.cpp etc
  */
 class Entity : public GameObject {
 protected:

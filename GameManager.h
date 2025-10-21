@@ -14,10 +14,9 @@
 #include "Enemy.h"
 #include "FileHandler.h"
 
-/**
- * @brief Main game controller managing game state, objects, and logic
- * 
- * Demonstrates proper memory management with smart pointers and error handling
+/*
+    Main game controller managing game state, objects, and logic
+    proper memory management with smart pointers and error handling
  */
 class GameManager {
 private:
@@ -36,7 +35,6 @@ private:
     // Game progression system
     int currentLevel;
     int highScore;
-    // Removed: sf::Font font; - Causing the constructor error
 
     // Game state management
     void initializeGame();
@@ -47,7 +45,7 @@ private:
     void handleMenuInput();
     void spawnWave();
     void nextLevel();
-    void renderUI(); // New method for UI rendering
+    void renderUI(); 
     void saveHighScore();
     void loadHighScore();
 

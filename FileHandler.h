@@ -8,11 +8,10 @@
 #include "Bullet.h"
 #include "Enemy.h"
 
-/**
- * @brief Handles file operations for saving and loading game state
- * 
- * Demonstrates file I/O operations and error handling
- */
+/*
+    Handles file operations for saving and loading game state
+    file I/O operations and error handling
+*/
 class FileHandler {
 private:
     std::string filename;

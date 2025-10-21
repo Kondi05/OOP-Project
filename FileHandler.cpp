@@ -78,7 +78,6 @@ bool FileHandler::loadGame(Player& player,
                 if (iss >> x >> y >> health >> score >> lives) {
                     player.setPosition({x, y});
                     player.setHealth(health);
-                    // Note: In full implementation, you'd have setters for score and lives
                 }
             }
             else if (type == "ENEMY") {
