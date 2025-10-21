@@ -2,10 +2,11 @@
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
+#include <cstdlib>
 
 Enemy::Enemy(float startX, float startY, int pointValue, float speed, int damage)
     : Entity(startX, startY, 10), movementSpeed(speed), 
-      direction{0.0f, 1.0f}, pointValue(pointValue), shootCooldown(1.0f), 
+      direction{0.0f, 1.0f}, pointValue(pointValue), shootCooldown(3.0f), 
       bulletDamage(damage), bulletSpeed(8.0f) {
     
     std::srand(static_cast<unsigned int>(std::time(nullptr)));

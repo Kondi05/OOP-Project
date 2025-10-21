@@ -32,24 +32,28 @@ void GameManager::spawnEnemies() {
 }
 
 void GameManager::spawnWave() {
-     int enemiesPerRow = 8;
+     int baseEnemiesPerRow = 8;
     int rows = 2;
-    
+
     for (int row = 0; row < rows; ++row) {
+        float rowOffset = (row % 2 == 0) ? 0.0f : 50.0f;
+        float enemiesPerRow = (row % 2 == 0) ? baseEnemiesPerRow :  baseEnemiesPerRow -1;
+        if (currentLevel == 3){
+            rows = 3;
+        }
+        
         for (int col = 0; col < enemiesPerRow; ++col) {
-            float x = 60.0f + col * 90.0f;
-            float y = -50.0f - row * 80.0f; 
+            float x = rowOffset + 50 + col * 100.0f;
+            float y = -15.0f - row * 70.0f; 
             float enemySpeed = 0.8f + (currentLevel - 1) * 1.2f; // Increased speed scaling
             int bulletDamage = 15 + (currentLevel - 1) * 8; // Increased damage scaling
-            float bulletSpeed =3.0f + (currentLevel - 1) * 1.2f; // Bullet speed increases
+            float bulletSpeed =3.5f + (currentLevel - 1) * 1.2f; // Bullet speed increases
             int pointValue = 50 + (currentLevel * 25);
-            
             auto enemy = std::make_unique<Enemy>(x, y, pointValue, enemySpeed, bulletDamage);
             enemy->setBulletSpeed(bulletSpeed); // Set bullet speed for this enemy
             enemies.push_back(std::move(enemy));
         }
     }
-    
     std::cout << "Wave " << currentLevel << " spawned " 
               << ", Speed: " << (1.0f + (currentLevel - 1) * 1.2f)
               << ", Bullet Damage: " << (15 + (currentLevel - 1) * 8)
