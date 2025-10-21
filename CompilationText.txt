@@ -1,0 +1,7 @@
+// Compilation text 
+// make clean
+// make
+
+// export DISPLAY=:0
+//./space_invaders
+
