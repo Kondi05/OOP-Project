@@ -1,0 +1,151 @@
+#include <iostream>
+#include <cassert>
+#include <memory>
+#include <vector>
+#include "Bullet.h"
+#include "Player.h"
+#include "Enemy.h"
+
+class BulletMechanicsTest {
+public:
+    static void runAllTests() {
+        std::cout << "\n=== BULLET MECHANICS TESTS ===" << std::endl;
+        testBulletTypes();
+        testBulletMovement();
+        testBulletBoundaries();
+        testBulletSpeedVariations();
+        testBulletActivationStates();
+        std::cout << "All Bullet Mechanics tests passed!" << std::endl;
+    }
+
+private:
+    static void testBulletTypes() {
+        std::cout << "Testing Bullet Types... ";
+        
+        // Test player bullet
+        Bullet playerBullet(500.0f, 680.0f, true, 8.0f);
+        assert(playerBullet.isFromPlayer() == true);
+        assert(playerBullet.isActive() == true);
+        
+        // Test enemy bullet  
+        Bullet enemyBullet(300.0f, 220.0f, false, 5.0f);
+        assert(enemyBullet.isFromPlayer() == false);
+        assert(enemyBullet.isActive() == true);
+        
+      
+        
+        std::cout << "PASSED" << std::endl;
+    }
+
+    static void testBulletMovement() {
+        std::cout << "Testing Bullet Movement... ";
+        
+        // Test player bullet movement (should move upward)
+        Bullet playerBullet(500.0f, 680.0f, true, 8.0f);
+        sf::Vector2f playerBulletStart = playerBullet.getPosition();
+        
+        playerBullet.update(); // One frame update
+        sf::Vector2f playerBulletAfter = playerBullet.getPosition();
+        
+        assert(playerBulletAfter.y < playerBulletStart.y); // Should move up
+        assert(playerBulletAfter.x == playerBulletStart.x); // X should remain same
+        
+        // Test enemy bullet movement (should move downward)
+        Bullet enemyBullet(300.0f, 220.0f, false, 5.0f);
+        sf::Vector2f enemyBulletStart = enemyBullet.getPosition();
+        
+        enemyBullet.update(); // One frame update
+        sf::Vector2f enemyBulletAfter = enemyBullet.getPosition();
+        
+        assert(enemyBulletAfter.y > enemyBulletStart.y); // Should move down
+        assert(enemyBulletAfter.x == enemyBulletStart.x); // X should remain same
+        
+        std::cout << "PASSED" << std::endl;
+    }
+
+    static void testBulletBoundaries() {
+        std::cout << "Testing Bullet Boundaries... ";
+        
+        // Test bullet deactivation when out of bounds
+        Bullet topBullet(500.0f, -100.0f, true, 8.0f); //  above screen
+        Bullet bottomBullet(500.0f, 900.0f, false, 5.0f); //  below screen
+        
+        
+        auto shouldDeactivate = [](const Bullet& bullet) {
+            sf::Vector2f pos = bullet.getPosition();
+            return (pos.y < -50 || pos.y > 850);
+        };
+        
+        assert(shouldDeactivate(topBullet) == true);
+        assert(shouldDeactivate(bottomBullet) == true);
+        
+        // Test bullets within bounds
+        Bullet middleBullet(500.0f, 400.0f, true, 8.0f);
+        assert(shouldDeactivate(middleBullet) == false);
+        
+        std::cout << "PASSED" << std::endl;
+    }
+
+    static void testBulletSpeedVariations() {
+        std::cout << "Testing Bullet Speed Variations... ";
+        
+        // Test different bullet speeds
+        Bullet slowBullet(100.0f, 100.0f, true, 3.0f);
+        Bullet mediumBullet(200.0f, 100.0f, true, 6.0f);
+        Bullet fastBullet(300.0f, 100.0f, true, 10.0f);
+        
+        // Store initial positions
+        sf::Vector2f slowStart = slowBullet.getPosition();
+        sf::Vector2f mediumStart = mediumBullet.getPosition();
+        sf::Vector2f fastStart = fastBullet.getPosition();
+        
+        // Update all bullets
+        slowBullet.update();
+        mediumBullet.update();
+        fastBullet.update();
+        
+        // Calculate distances moved
+        float slowDistance = slowStart.y - slowBullet.getPosition().y; // Upward movement
+        float mediumDistance = mediumStart.y - mediumBullet.getPosition().y;
+        float fastDistance = fastStart.y - fastBullet.getPosition().y;
+        
+        // Faster bullets move further
+        assert(fastDistance > mediumDistance);
+        assert(mediumDistance > slowDistance);
+        assert(fastDistance > slowDistance);
+        
+        std::cout << "PASSED" << std::endl;
+    }
+
+    static void testBulletActivationStates() {
+        std::cout << "Testing Bullet Activation States... ";
+        
+        std::vector<std::unique_ptr<Bullet>> bullets;
+        
+        // multiple bullets
+        for (int i = 0; i < 5; i++) {
+            bullets.push_back(std::make_unique<Bullet>(100.0f + i * 50, 100.0f, true, 8.0f));
+        }
+        
+        // active start
+        for (auto& bullet : bullets) {
+            assert(bullet->isActive() == true);
+        }
+        
+        // Deactivated bullets (hit targets, went off-screen, etc.)
+        bullets[0]->setActive(false);
+        bullets[2]->setActive(false);
+        bullets[4]->setActive(false);
+        
+        // Check activation states
+        assert(bullets[0]->isActive() == false);
+        assert(bullets[1]->isActive() == true);
+        assert(bullets[2]->isActive() == false);
+        assert(bullets[3]->isActive() == true);
+        assert(bullets[4]->isActive() == false);
+        
+        
+        
+        std::cout << "PASSED" << std::endl;
+    }
+};

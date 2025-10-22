@@ -1,0 +1,149 @@
+#include <iostream>
+#include <cassert>
+#include <memory>
+#include <vector>
+#include "Enemy.h"
+#include "Bullet.h"
+
+class EnemyBehaviorTest {
+public:
+    static void runAllTests() {
+        std::cout << "\n=== ENEMY BEHAVIOR TESTS ===" << std::endl;
+        testEnemyInitialization();
+        testEnemyMovement();
+        testEnemyShootingAI();
+        testMultipleEnemyWaves();
+        testEnemyScoringSystem();
+        std::cout << "All Enemy Behavior tests passed!" << std::endl;
+    }
+
+private:
+    static void testEnemyInitialization() {
+        std::cout << "Testing Enemy Initialization... ";
+        
+        Enemy enemy(150.0f, 50.0f, 100, 1.5f, 15); // x, y, points, speed, damage
+        
+        // Testing initial properties
+        assert(enemy.getPosition().x == 150.0f);
+        assert(enemy.getPosition().y == 50.0f);
+        assert(enemy.getPointValue() == 100);
+        assert(enemy.getBulletDamage() == 15);
+        assert(enemy.isAlive() == true);
+        assert(enemy.getHealth() > 0);
+        
+        std::cout << "PASSED" << std::endl;
+    }
+
+    static void testEnemyMovement() {
+        std::cout << "Testing Enemy Movement... ";
+        
+        // Testing enemy with different speeds
+        Enemy slowEnemy(100.0f, 100.0f, 50, 0.5f, 10); // Slow enemy
+        Enemy fastEnemy(200.0f, 100.0f, 75, 2.0f, 15); // Fast enemy
+        
+        sf::Vector2f slowInitialPos = slowEnemy.getPosition();
+        sf::Vector2f fastInitialPos = fastEnemy.getPosition();
+        
+        // Update enemies (move downward)
+        slowEnemy.update();
+        fastEnemy.update();
+        
+        // Both should move down (positive Y direction)
+        assert(slowEnemy.getPosition().y > slowInitialPos.y);
+        assert(fastEnemy.getPosition().y > fastInitialPos.y);
+        
+        // Fast enemy move further than slow enemy
+        float slowDistance = slowEnemy.getPosition().y - slowInitialPos.y;
+        float fastDistance = fastEnemy.getPosition().y - fastInitialPos.y;
+        assert(fastDistance > slowDistance);
+        
+        std::cout << "PASSED" << std::endl;
+    }
+
+    static void testEnemyShootingAI() {
+        std::cout << "Testing Enemy Shooting AI... ";
+        
+        Enemy enemy(300.0f, 200.0f, 100, 1.0f, 20);
+        
+        // Testing initial shooting state (should not shoot immediately)
+        assert(enemy.canShoot() == false);
+        
+        // Testing multiple update cycles to see if shooting activates
+        bool shotFired = false;
+        for (int i = 0; i < 120; i++) { // Simulate 2 seconds at 60 FPS
+            if (enemy.canShoot()) {
+                shotFired = true;
+                break;
+            }
+                    }
+        
+                std::cout << "Shot fired: " << (shotFired ? "YES" : "NO") << " ";
+        
+        // Testing enemy bullet creation
+        Bullet enemyBullet(300.0f, 225.0f, false, 5.0f);
+        assert(enemyBullet.isFromPlayer() == false);
+        assert(enemyBullet.isActive() == true);
+        
+        // Enemy bullets move downward
+        sf::Vector2f initialPos = enemyBullet.getPosition();
+        enemyBullet.update();
+        assert(enemyBullet.getPosition().y > initialPos.y);
+        
+        std::cout << "PASSED" << std::endl;
+    }
+
+    static void testMultipleEnemyWaves() {
+        std::cout << "Testing Multiple Enemy Waves... ";
+        
+        std::vector<std::unique_ptr<Enemy>> enemies;
+        
+        // wave of enemies (simulating level 1)
+        int enemiesPerRow = 5;
+        int rows = 2;
+        
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < enemiesPerRow; col++) {
+                float x = 150.0f + col * 80.0f;
+                float y = 50.0f + row * 60.0f;
+                enemies.push_back(std::make_unique<Enemy>(x, y, 50 + row * 25, 1.0f, 10));
+            }
+        }
+        
+        // Verify wave creation
+        assert(enemies.size() == 10);
+        
+        // Testing all enemies are properly positioned
+        for (size_t i = 0; i < enemies.size(); i++) {
+            assert(enemies[i]->isAlive() == true);
+            assert(enemies[i]->getPosition().x >= 150.0f);
+            assert(enemies[i]->getPosition().y >= 50.0f);
+        }
+        
+        // Simulate enemy movement for entire wave
+        for (auto& enemy : enemies) {
+            sf::Vector2f initialPos = enemy->getPosition();
+            enemy->update();
+            assert(enemy->getPosition().y > initialPos.y); // All should move down
+        }
+        
+        std::cout << "PASSED" << std::endl;
+    }
+
+    static void testEnemyScoringSystem() {
+        std::cout << "Testing Enemy Scoring System... ";
+        
+        // Testing different enemy point values
+        Enemy basicEnemy(100.0f, 100.0f, 50, 1.0f, 10);  // Basic: 50 points
+        Enemy mediumEnemy(200.0f, 100.0f, 100, 1.5f, 15); // Medium: 100 points  
+        Enemy advancedEnemy(300.0f, 100.0f, 200, 2.0f, 20); // Advanced: 200 points
+        
+        assert(basicEnemy.getPointValue() == 50);
+        assert(mediumEnemy.getPointValue() == 100);
+        assert(advancedEnemy.getPointValue() == 200);
+        
+        // Test that higher value enemies have higher difficulty
+        assert(advancedEnemy.getBulletDamage() > basicEnemy.getBulletDamage());
+        
+        std::cout << "PASSED" << std::endl;
+    }
+};

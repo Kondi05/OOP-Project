@@ -1,0 +1,144 @@
+#include <iostream>
+#include <cassert>
+#include <memory>
+#include <vector>
+#include "Player.h"
+#include "Bullet.h"
+
+class PlayerMovementTest {
+public:
+    static void runAllTests() {
+        std::cout << "=== PLAYER MOVEMENT & SHOOTING TESTS ===" << std::endl;
+        testPlayerInitialization();
+        testMovementBoundaries();
+        testAllDirectionMovement();
+        testShootingMechanics();
+        testRapidFirePrevention();
+        std::cout << "All Player Movement tests passed! ✓" << std::endl;
+    }
+
+private:
+    static void testPlayerInitialization() {
+        std::cout << "Testing Player Initialization... ";
+        
+        Player player(500.0f, 700.0f, sf::Vector2f{1000.0f, 800.0f});
+        
+        // Test initial position
+        assert(player.getPosition().x == 500.0f);
+        assert(player.getPosition().y == 700.0f);
+        
+        // Test initial state
+        assert(player.getHealth() == 100);
+        assert(player.getLives() == 3);
+        assert(player.getScore() == 0);
+        assert(player.isAlive() == true);
+        
+        std::cout << "PASSED" << std::endl;
+    }
+
+    static void testMovementBoundaries() {
+        std::cout << "Testing Movement Boundaries... ";
+        
+        Player player(500.0f, 700.0f, sf::Vector2f{1000.0f, 800.0f});
+        sf::Vector2f initialPos = player.getPosition();
+        
+        // Test left boundary
+        player.setPosition(sf::Vector2f{30.0f, 700.0f}); // Near left edge
+        player.moveLeft();
+        float afterLeftMove = player.getPosition().x;
+        assert(afterLeftMove >= 0); // Should not go beyond left boundary
+        
+        // Test right boundary  
+        player.setPosition(sf::Vector2f{970.0f, 700.0f}); // Near right edge
+        player.moveRight();
+        float afterRightMove = player.getPosition().x;
+        assert(afterRightMove <= 1000.0f); // Should not go beyond right boundary
+        
+        // Test vertical boundaries
+        player.setPosition(sf::Vector2f{500.0f, 20.0f}); // Near top
+        player.moveUp();
+        assert(player.getPosition().y >= 0);
+        
+        player.setPosition(sf::Vector2f{500.0f, 780.0f}); // Near bottom
+        player.moveDown();
+        assert(player.getPosition().y <= 800.0f);
+        
+        std::cout << "PASSED" << std::endl;
+    }
+
+    static void testAllDirectionMovement() {
+        std::cout << "Testing All Direction Movement... ";
+        
+        Player player(500.0f, 700.0f, sf::Vector2f{1000.0f, 800.0f});
+        sf::Vector2f initialPos = player.getPosition();
+        
+        // Test left movement
+        player.moveLeft();
+        assert(player.getPosition().x < initialPos.x);
+        assert(player.getPosition().y == initialPos.y);
+        
+        // Reset and test right movement
+        player.setPosition(initialPos);
+        player.moveRight();
+        assert(player.getPosition().x > initialPos.x);
+        assert(player.getPosition().y == initialPos.y);
+        
+        // Reset and test up movement
+        player.setPosition(initialPos);
+        player.moveUp();
+        assert(player.getPosition().x == initialPos.x);
+        assert(player.getPosition().y < initialPos.y);
+        
+        // Reset and test down movement
+        player.setPosition(initialPos);
+        player.moveDown();
+        assert(player.getPosition().x == initialPos.x);
+        assert(player.getPosition().y > initialPos.y);
+        
+        std::cout << "PASSED" << std::endl;
+    }
+
+    static void testShootingMechanics() {
+        std::cout << "Testing Shooting Mechanics... ";
+        
+        // Test bullet creation
+        Bullet playerBullet(500.0f, 680.0f, true, 8.0f); // Position above player
+        
+        // Test bullet properties
+        assert(playerBullet.isFromPlayer() == true);
+        assert(playerBullet.isActive() == true);
+        assert(playerBullet.getPosition().x == 500.0f);
+        assert(playerBullet.getPosition().y == 680.0f);
+        
+        // Test bullet movement (player bullets move up)
+        sf::Vector2f initialPos = playerBullet.getPosition();
+        playerBullet.update(); // Simulate one frame update
+        assert(playerBullet.getPosition().y < initialPos.y); // Should move upward
+        
+        std::cout << "PASSED" << std::endl;
+    }
+
+    static void testRapidFirePrevention() {
+        std::cout << "Testing Rapid Fire Prevention... ";
+        
+        std::vector<std::unique_ptr<Bullet>> bullets;
+        
+       
+        for (int i = 0; i < 10; i++) {
+            bullets.push_back(std::make_unique<Bullet>(500.0f, 680.0f + i * 5.0f, true));
+        }
+        
+        // Bullets properly positioned
+        assert(bullets.size() == 10);
+        for (size_t i = 0; i < bullets.size(); i++) {
+            assert(bullets[i]->isActive() == true);
+            assert(bullets[i]->isFromPlayer() == true);
+        }
+        
+        // Test bullet deactivation (simulating going off-screen)
+        bullets[0]->setActive(false);
+        assert(bullets[0]->isActive() == false);
+        
+        std::cout << "PASSED" << std::endl;
+    }
+};

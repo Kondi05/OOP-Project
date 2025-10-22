@@ -1,0 +1,175 @@
+#include <iostream>
+#include <cassert>
+#include <memory>
+#include <vector>
+#include "Player.h"
+#include "Enemy.h"
+
+class GameStateTest {
+public:
+    static void runAllTests() {
+        std::cout << "\n=== GAME STATE & PROGRESSION TESTS ===" << std::endl;
+        testScoreSystem();
+        testLevelProgression();
+        testPlayerLivesSystem();
+        testGameOverConditions();
+        testDifficultyScaling();
+        std::cout << "All Game State tests passed" << std::endl;
+    }
+
+private:
+    static void testScoreSystem() {
+        std::cout << "Testing Score System... ";
+        
+        Player player(500.0f, 700.0f, sf::Vector2f{1000.0f, 800.0f});
+        
+        // Test initial score
+        assert(player.getScore() == 0);
+        
+        // Test score accumulation
+        player.increaseScore(50);
+        assert(player.getScore() == 50);
+        
+        player.increaseScore(100);
+        assert(player.getScore() == 150);
+        
+        player.increaseScore(25);
+        assert(player.getScore() == 175);
+        
+        // Test large score values
+        player.increaseScore(1000);
+        assert(player.getScore() == 1175);
+        
+        std::cout << "PASSED" << std::endl;
+    }
+
+    static void testLevelProgression() {
+        std::cout << "Testing Level Progression... ";
+        
+        // multiple levels with increasing difficulty
+        for (int level = 1; level <= 5; level++) {
+            // Calculate level-based properties (like in actual game)
+            float enemySpeed = 0.5f + (level - 1) * 1.2f;
+            int bulletDamage = 15 + (level - 1) * 8;
+            float bulletSpeed = 3.0f + (level - 1) * 1.05f;
+            int pointValue = 50 + (level * 25);
+            
+            // difficulty increases with level verification
+            if (level > 1) {
+                assert(enemySpeed > 0.5f);
+                assert(bulletDamage > 15);
+                assert(bulletSpeed > 3.0f);
+                assert(pointValue > 50);
+            }
+            
+            // Test enemy creation with level-specific stats
+            Enemy enemy(100.0f, 100.0f, pointValue, enemySpeed, bulletDamage);
+            assert(enemy.getPointValue() == pointValue);
+        }
+        
+        std::cout << "PASSED" << std::endl;
+    }
+
+    static void testPlayerLivesSystem() {
+        std::cout << "Testing Player Lives System... ";
+        
+        Player player(500.0f, 700.0f, sf::Vector2f{1000.0f, 800.0f});
+        
+        // Test initial lives
+        assert(player.getLives() == 3);
+        assert(player.isAlive() == true);
+        
+        // Test losing lives
+        player.loseLife();
+        assert(player.getLives() == 2);
+        assert(player.isAlive() == true);
+        
+        player.loseLife();
+        assert(player.getLives() == 1);
+        assert(player.isAlive() == true);
+        
+        player.loseLife();
+        assert(player.getLives() == 0);
+        // Player is "alive" until health reaches 0
+        
+        
+        std::cout << "PASSED" << std::endl;
+    }
+
+    static void testGameOverConditions() {
+        std::cout << "Testing Game Over Conditions... ";
+        
+        Player player(500.0f, 700.0f, sf::Vector2f{1000.0f, 800.0f});
+        
+        // Test health-based game over
+        player.setHealth(100);
+        assert(player.isAlive() == true);
+        
+        player.setHealth(50);
+        assert(player.isAlive() == true);
+        
+        player.setHealth(1);
+        assert(player.isAlive() == true);
+        
+        player.setHealth(0);
+        assert(player.isAlive() == false);
+        
+        // Test that player can take damage
+        player.setHealth(100);
+        player.takeDamage(25);
+        assert(player.getHealth() == 75);
+        assert(player.isAlive() == true);
+        
+        player.takeDamage(75);
+        assert(player.getHealth() == 0);
+        assert(player.isAlive() == false);
+        
+        std::cout << "PASSED" << std::endl;
+    }
+
+    static void testDifficultyScaling() {
+        std::cout << "Testing Difficulty Scaling... ";
+        
+        // Testing higher levels have tougher enemies
+        std::vector<std::unique_ptr<Enemy>> level1Enemies;
+        std::vector<std::unique_ptr<Enemy>> level3Enemies;
+        
+        // level 1 enemies
+        for (int i = 0; i < 3; i++) {
+            level1Enemies.push_back(std::make_unique<Enemy>(
+                100.0f + i * 100, 100.0f, 
+                50,  // points
+                1.0f, // speed  
+                10   // damage
+            ));
+        }
+        
+        // level 3 enemies (higher difficulty)
+        for (int i = 0; i < 3; i++) {
+            level3Enemies.push_back(std::make_unique<Enemy>(
+                100.0f + i * 100, 100.0f,
+                100, // more points
+                2.5f, // faster
+                20    // more damage
+            ));
+        }
+        
+        // Verification of level 3 enemies are more dangerous
+        assert(level3Enemies[0]->getPointValue() > level1Enemies[0]->getPointValue());
+        assert(level3Enemies[0]->getBulletDamage() > level1Enemies[0]->getBulletDamage());
+        
+        // Test movement speed difference
+        sf::Vector2f level1Pos = level1Enemies[0]->getPosition();
+        sf::Vector2f level3Pos = level3Enemies[0]->getPosition();
+        
+        level1Enemies[0]->update();
+        level3Enemies[0]->update();
+        
+        float level1Distance = level1Enemies[0]->getPosition().y - level1Pos.y;
+        float level3Distance = level3Enemies[0]->getPosition().y - level3Pos.y;
+        
+        assert(level3Distance > level1Distance); // Level 3 enemy should move faster
+        
+        std::cout << "PASSED" << std::endl;
+    }
+};

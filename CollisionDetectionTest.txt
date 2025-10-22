@@ -1,0 +1,162 @@
+#include <iostream>
+#include <cassert>
+#include <memory>
+#include <vector>
+#include <cmath>
+#include "Player.h"
+#include "Enemy.h"
+#include "Bullet.h"
+
+class CollisionDetectionTest {
+public:
+    static void runAllTests() {
+        std::cout << "\n=== COLLISION DETECTION TESTS ===" << std::endl;
+        testPlayerEnemyCollision();
+        testPlayerBulletCollision();
+        testEnemyBulletCollision();
+        testCollisionDistanceCalculation();
+        testMultipleCollisions();
+        std::cout << "All Collision Detection tests passed!" << std::endl;
+    }
+
+private:
+    static float calculateDistance(sf::Vector2f pos1, sf::Vector2f pos2) {
+        float dx = pos1.x - pos2.x;
+        float dy = pos1.y - pos2.y;
+        return std::sqrt(dx * dx + dy * dy);
+    }
+
+    static void testPlayerEnemyCollision() {
+        std::cout << "Testing Player-Enemy Collision... ";
+        
+        Player player(500.0f, 700.0f, sf::Vector2f{1000.0f, 800.0f});
+        Enemy enemy(500.0f, 700.0f, 100, 1.0f, 10); // Same position as player
+        
+        // distance between player and enemy
+        float distance = calculateDistance(player.getPosition(), enemy.getPosition());
+        
+        // distance = 0 (definite collision)
+        assert(distance == 0.0f);
+        
+        // Testing collision detection 
+        bool collision = (distance < 35.0f); // Using game's collision threshold
+        assert(collision == true);
+        
+        // Testing non-collision scenario
+        Enemy distantEnemy(100.0f, 100.0f, 100, 1.0f, 10); // Far from player
+        float distantDistance = calculateDistance(player.getPosition(), distantEnemy.getPosition());
+        bool noCollision = (distantDistance < 35.0f);
+        assert(noCollision == false);
+        
+        std::cout << "PASSED" << std::endl;
+    }
+
+    static void testPlayerBulletCollision() {
+        std::cout << "Testing Player-Bullet Collision... ";
+        
+        Player player(500.0f, 700.0f, sf::Vector2f{1000.0f, 800.0f});
+        
+        // Test collision with enemy bullet
+        Bullet enemyBullet(500.0f, 700.0f, false, 5.0f); // Same position as player
+        
+        float distance = calculateDistance(player.getPosition(), enemyBullet.getPosition());
+        bool collision = (distance < 30.0f); // Using game's bullet collision threshold
+        assert(collision == true);
+        
+        // Test player bullets don't collide with player
+        Bullet playerBullet(500.0f, 700.0f, true, 8.0f);
+        bool playerBulletCollision = (distance < 30.0f) && !playerBullet.isFromPlayer();
+        assert(playerBulletCollision == false); // Should not count as collision
+        
+        std::cout << "PASSED" << std::endl;
+    }
+
+    static void testEnemyBulletCollision() {
+        std::cout << "Testing Enemy-Bullet Collision... ";
+        
+        Enemy enemy(300.0f, 200.0f, 100, 1.0f, 10);
+        
+        // Test collision with player bullet
+        Bullet playerBullet(300.0f, 200.0f, true, 8.0f); // Same position as enemy
+        
+        float distance = calculateDistance(enemy.getPosition(), playerBullet.getPosition());
+        bool collision = (distance < 25.0f); // Using game's enemy-bullet threshold
+        assert(collision == true);
+        
+        // Test damage application
+        int initialHealth = enemy.getHealth();
+        enemy.takeDamage(10);
+        assert(enemy.getHealth() == initialHealth - 10);
+        assert(enemy.isAlive() == true); // Should still be alive
+        
+        // Test lethal damage
+        enemy.takeDamage(initialHealth); // More than enough damage
+        assert(enemy.getHealth() == 0);
+        assert(enemy.isAlive() == false);
+        
+        std::cout << "PASSED" << std::endl;
+    }
+
+    static void testCollisionDistanceCalculation() {
+        std::cout << "Testing Distance Calculations... ";
+        
+        // Test various distance scenarios
+        sf::Vector2f pos1(100.0f, 100.0f);
+        sf::Vector2f pos2(100.0f, 130.0f); // 30 units below
+        
+        float distance = calculateDistance(pos1, pos2);
+        assert(distance == 30.0f); // Exact vertical distance
+        
+        // Test diagonal distance
+        sf::Vector2f pos3(100.0f, 100.0f);
+        sf::Vector2f pos4(130.0f, 130.0f); // 30 units right and down
+        
+        float diagonalDistance = calculateDistance(pos3, pos4);
+        float expected = std::sqrt(30.0f * 30.0f + 30.0f * 30.0f); // Pythagorean theorem
+        assert(std::abs(diagonalDistance - expected) < 0.001f); // Allow floating point error
+        
+        // Test zero distance
+        float zeroDistance = calculateDistance(pos1, pos1);
+        assert(zeroDistance == 0.0f);
+        
+        std::cout << "PASSED" << std::endl;
+    }
+
+    static void testMultipleCollisions() {
+        std::cout << "Testing Multiple Collisions... ";
+        
+        Player player(500.0f, 700.0f, sf::Vector2f{1000.0f, 800.0f});
+        std::vector<std::unique_ptr<Enemy>> enemies;
+        std::vector<std::unique_ptr<Bullet>> bullets;
+        
+        // Creating enemies at various distances from player
+        enemies.push_back(std::make_unique<Enemy>(500.0f, 700.0f, 100, 1.0f, 10)); // Collision
+        enemies.push_back(std::make_unique<Enemy>(600.0f, 700.0f, 100, 1.0f, 10)); // No collision
+        enemies.push_back(std::make_unique<Enemy>(500.0f, 735.0f, 100, 1.0f, 10)); // Edge case
+        
+        // bullets
+        bullets.push_back(std::make_unique<Bullet>(500.0f, 700.0f, false, 5.0f)); // Collision with player
+        bullets.push_back(std::make_unique<Bullet>(500.0f, 700.0f, true, 8.0f));  // Collision with enemy
+        
+        // collision test detection
+        int collisionCount = 0;
+        for (auto& enemy : enemies) {
+            float distance = calculateDistance(player.getPosition(), enemy->getPosition());
+            if (distance < 35.0f) {
+                collisionCount++;
+            }
+        }
+        assert(collisionCount == 2); // collision of two enemies        
+        // Test bullet collisions
+        int bulletCollisionCount = 0;
+        for (auto& bullet : bullets) {
+            float distance = calculateDistance(player.getPosition(), bullet->getPosition());
+            if (distance < 30.0f && !bullet->isFromPlayer()) {
+                bulletCollisionCount++;
+            }
+        }
+        assert(bulletCollisionCount == 1); // One enemy bullet collide with player
+        
+        std::cout << "PASSED" << std::endl;
+    }
+};
