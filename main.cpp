@@ -5,17 +5,7 @@
 
 // Function to demonstrate polymorphism
 void demonstratePolymorphism() {
-    std::cout << "=== Polymorphism Demonstration ===" << std::endl;
-    
-    // Create different game objects through base class pointers
-    std::vector<std::unique_ptr<GameObject>> gameObjects;
-    
-    // These would be created in a real demonstration
-    std::cout << "Game objects would demonstrate polymorphic behavior:" << std::endl;
-    std::cout << "- Player, Enemy, and Bullet all implement GameObject interface" << std::endl;
-    std::cout << "- Each has different update() and render() behavior" << std::endl;
-    std::cout << "- All can be stored in the same container" << std::endl;
-    std::cout << "==================================" << std::endl;
+
 }
 
 // Function to test normal operation
@@ -72,7 +62,6 @@ void runEdgeCaseTests() {
 
 int main(int argc, char* argv[]) {
     std::cout << "Space Invaders - SFML 3.0.2" << std::endl;
-    std::cout << "OOP Implementation with Full Rubric Compliance" << std::endl;
     std::cout << "==============================================" << std::endl;
     
     // Check for test mode

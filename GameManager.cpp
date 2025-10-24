@@ -327,7 +327,7 @@ void GameManager::renderUI() {
     frameCount++;
     
     if (frameCount >= 30) {
-        std::cout << "\r=== INFINITE SPACE INVADERS ===";
+        std::cout << "\r=== SPACE INVADERS ===";
         std::cout << " | Score: " << player->getScore();
         std::cout << " | High Score: " << highScore;
         std::cout << " | Level: " << currentLevel;
